@@ -1,11 +1,6 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import Link from "next/link";
-import { gql, useMutation, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import AppContext from "../../context/state";
-import { Fragment } from "react";
-import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { BellIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
 import { UserContext } from "../Layout/Layout";
 
 const Header = () => {
@@ -13,10 +8,10 @@ const Header = () => {
   const [inform, setInform] = useState(null);
   const [toggleMenu, setToggleMenu] = useState(false);
   const { currentUser, setCurrentUser } = useContext(UserContext);
-  const handleToggle = () => {
+  const handleToggle = (): void => {
     setToggleMenu(!toggleMenu);
   };
-  const logOut = () => {
+  const logOut = (): void => {
     router.push("/account/signin");
   };
 

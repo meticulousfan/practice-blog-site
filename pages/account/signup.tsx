@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { gql, useMutation } from "@apollo/client";
 import toast, { Toaster } from "react-hot-toast";
@@ -7,11 +7,16 @@ import * as Yup from "yup";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { NextPage } from "next";
-import { UserContext } from "../../components/Layout/Layout";
 
-const UserMutation = gql`
-  mutation ($name: String!, $email: String!, $password: String!) {
-    signup(name: $name, email: $email, password: $password) {
+type signUpProps = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+const SIGN_UP = gql`
+  mutation SingUp($name: String!, $email: String!, $password: String!) {
+    signUp(name: $name, email: $email, password: $password) {
       token
       message
       user {
@@ -22,8 +27,6 @@ const UserMutation = gql`
   }
 `;
 const Signup: NextPage<{}> = () => {
-  const { currentUser, setCurrentUser } = useContext(UserContext);
-
   useEffect(() => {
     localStorage.removeItem("token");
   }, []);
@@ -39,17 +42,17 @@ const Signup: NextPage<{}> = () => {
   });
   const formOptions = { resolver: yupResolver(formSchema) };
 
-  const { register, handleSubmit, reset, formState } = useForm(formOptions);
+  const { register, handleSubmit, formState } = useForm(formOptions);
   const { errors } = formState;
 
-  const [signup, { loading, error }] = useMutation(UserMutation);
+  const [signUp, { loading, error }] = useMutation(SIGN_UP);
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: signUpProps): void => {
     const { name, email, password } = data;
     const variables = { name, email, password };
     try {
       toast
-        .promise(signup({ variables }), {
+        .promise(signUp({ variables }), {
           loading: "Creating new User..",
           success: "User successfully created!🎉",
           error: `Something went wrong 😥 Please try again -  ${error}`,
@@ -63,64 +66,77 @@ const Signup: NextPage<{}> = () => {
   };
 
   return (
-    <div className="container mx-auto max-w-md py-12">
+    <div className="max-w-screen-sm mx-auto mt-5 bg-white shadow sm:rounded-lg flex justify-center">
       <Toaster />
-      <h1 className="text-3xl font-medium my-5">Register</h1>
-      <form
-        className="grid grid-cols-1 gap-y-6 shadow-lg p-8 rounded-lg"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <label className="block">
-          <span className="text-gray-700">name</span>
-          <input
-            placeholder="name"
-            name="name"
-            type="text"
-            {...register("name", { required: true })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          />
-        </label>
-        <label className="block">
-          <span className="text-gray-700">email</span>
-          <input
-            placeholder="email"
-            {...register("email", { required: true })}
-            name="email"
-            type="email"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          />
-        </label>
-        <label className="block">
-          <span className="text-gray-700">password</span>
-          <input
-            placeholder="password"
-            {...register("password")}
-            name="password"
-            type="password"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          />
-          <div className="invalid-feedback">{errors.password?.message}</div>
-        </label>
-        <label className="block">
-          <span className="text-gray-700">Confirm password</span>
-          <input
-            placeholder="confirm password"
-            {...register("confirmPwd")}
-            name="confirmPwd"
-            type="password"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          />
-          <div className="invalid-feedback">{errors.confirmPwd?.message}</div>
-        </label>
-
-        <button
-          type="submit"
-          className="my-4 capitalize bg-blue-500 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-600"
-        >
-          submit
-        </button>
-        <Link href="/account/signin">Link to signin page</Link>
-      </form>
+      <div className="w-full p-6 sm:p-12">
+        <div className="mt-12 flex flex-col items-center">
+          <h1 className="text-2xl xl:text-3xl font-extrabold">Sign up</h1>
+          <div className="w-full flex-1 mt-8">
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="my-12 border-b text-center">
+                <div className="leading-none px-2 inline-block text-sm text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2">
+                  sign up with e-mail
+                </div>
+              </div>
+              <div className="mx-auto max-w-xs">
+                <input
+                  className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                  type="name"
+                  name="name"
+                  {...register("name", { required: true })}
+                  placeholder="name"
+                />
+                <input
+                  className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                  type="email"
+                  name="email"
+                  {...register("email", { required: true })}
+                  placeholder="Email"
+                />
+                <input
+                  className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                  type="password"
+                  {...register("password")}
+                  name="password"
+                  placeholder="Password"
+                />
+                <div className="invalid-feedback">
+                  {errors.password?.message}
+                </div>
+                <input
+                  className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                  placeholder="confirm password"
+                  {...register("confirmPwd")}
+                  name="confirmPwd"
+                  type="password"
+                />
+                <div className="invalid-feedback">
+                  {errors.confirmPwd?.message}
+                </div>
+                <button
+                  type="submit"
+                  className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+                >
+                  <svg
+                    className="w-6 h-6 -ml-2"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                    <circle cx="8.5" cy="7" r="4" />
+                    <path d="M20 8v6M23 11h-6" />
+                  </svg>
+                  <span className="ml-3">Sign Up</span>
+                </button>
+                <Link href="/account/signin">Link to signin page</Link>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,13 +1,28 @@
 import Modal from "react-modal";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { gql, useMutation } from "@apollo/client";
 import { yupResolver } from "@hookform/resolvers/yup";
-import toast, { Toaster } from "react-hot-toast";
 import * as Yup from "yup";
 import { NextPage } from "next";
 
-const BlogMutation = gql`
-  mutation ($title: String!, $description: String!, $category: String!) {
+const customStyles = {
+  content: {
+    width: "50%",
+    top: "50%",
+    left: "50%",
+    right: "50%",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+  },
+};
+
+const CREATE_BLOG = gql`
+  mutation CreateBlog(
+    $title: String!
+    $description: String!
+    $category: String!
+  ) {
     createBlog(title: $title, description: $description, category: $category) {
       title
       description
@@ -18,8 +33,14 @@ const BlogMutation = gql`
 
 type Props = {
   isOpen: Boolean;
-  showModal: Function;
-  setUpdatedFlag: Function;
+  showModal: (flag: boolean) => void;
+  setUpdatedFlag: () => void;
+};
+
+type Blog = {
+  title: string;
+  description: string;
+  category: string;
 };
 
 const ModalConfirm: NextPage<Props> = ({
@@ -34,158 +55,98 @@ const ModalConfirm: NextPage<Props> = ({
   });
   const formOptions = { resolver: yupResolver(formSchema) };
 
-  const { register, handleSubmit, reset, formState } = useForm(formOptions);
-  const { errors } = formState;
+  const { register, handleSubmit } = useForm(formOptions);
 
-  const [createBlog, { loading, error }] = useMutation(BlogMutation);
-  const onSubmit = (data) => {
+  const [createBlog] = useMutation(CREATE_BLOG);
+  const onSubmit = (data: Blog): void => {
     const { title, description, category } = data;
     const variables = { title, description, category };
     try {
-      toast
-        .promise(createBlog({ variables }), {
-          loading: "Creating new blog..",
-          success: "Blog successfully created!🎉",
-          error: `Something went wrong 😥 Please try again -  ${error}`,
-        })
-        .then((res) => {
-          if (res) {
-            setUpdatedFlag();
-            showModal(false);
-          }
-        });
+      createBlog({ variables }).then((res) => {
+        if (res) {
+          setUpdatedFlag();
+          showModal(false);
+        }
+      });
     } catch (error) {
       console.error(error);
     }
   };
 
   return (
-    <Modal isOpen={isOpen}>
-      <div className="block p-6 rounded-lg bg-white">
-        <form
-          className="grid grid-cols-1 gap-y-6 p-8"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <span>Post a blog</span>
-          <div className="form-group mb-6">
+    <Modal isOpen={isOpen} style={customStyles}>
+      <div className="max-w-screen-md mx-auto rounded-lg bg-white">
+        <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
+          <h3 className="text-3xl sm:text-4xl leading-normal font-extrabold tracking-tight text-gray-900 text-center">
+            Post <span className="text-indigo-600">blog</span>
+          </h3>
+          <div className="flex flex-wrap -mx-3 mb-6">
+            <div className="w-full px-3">
+              <label
+                className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                htmlFor="grid-password"
+              >
+                Title
+              </label>
+            </div>
             <input
               type="text"
-              className="form-control block
-                        w-full
-                        px-3
-                        py-1.5
-                        text-base
-                        font-normal
-                        text-gray-700
-                        bg-white bg-clip-padding
-                        border border-solid border-gray-300
-                        rounded
-                        transition
-                        ease-in-out
-                        m-0
-                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-              id="exampleInput7"
+              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+              id="grid-email"
               placeholder="title"
               name="title"
               {...register("title", { required: true })}
             />
           </div>
-          <div className="form-group mb-6">
+          <div className="flex flex-wrap -mx-3 mb-6">
+            <div className="w-full px-3">
+              <label
+                className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                htmlFor="grid-password"
+              >
+                Category
+              </label>
+            </div>
             <input
               type="text"
-              className="form-control block
-                        w-full
-                        px-3
-                        py-1.5
-                        text-base
-                        font-normal
-                        text-gray-700
-                        bg-white bg-clip-padding
-                        border border-solid border-gray-300
-                        rounded
-                        transition
-                        ease-in-out
-                        m-0
-                        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-              id="exampleInput7"
-              placeholder="category"
+              className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+              id="grid-email"
+              placeholder="title"
               name="category"
               {...register("category", { required: true })}
             />
           </div>
-          <div className="form-group mb-6">
-            <textarea
-              className="
-        form-control
-        block
-        w-full
-        px-3
-        py-1.5
-        text-base
-        font-normal
-        text-gray-700
-        bg-white bg-clip-padding
-        border border-solid border-gray-300
-        rounded
-        transition
-        ease-in-out
-        m-0
-        focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
-      "
-              id="exampleFormControlTextarea13"
-              rows="3"
-              placeholder="description"
-              name="description"
-              {...register("description", { required: true })}
-            ></textarea>
+          <div className="flex flex-wrap -mx-3 mb-6">
+            <div className="w-full px-3">
+              <label
+                className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                htmlFor="grid-password"
+              >
+                description
+              </label>
+              <textarea
+                rows={10}
+                name="description"
+                {...register("description", { required: true })}
+                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+              ></textarea>
+            </div>
           </div>
-          <button
-            type="submit"
-            className="
-      w-full
-      px-6
-      py-2.5
-      bg-blue-600
-      text-white
-      font-medium
-      text-xs
-      leading-tight
-      uppercase
-      rounded
-      shadow-md
-      hover:bg-blue-700 hover:shadow-lg
-      focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0
-      active:bg-blue-800 active:shadow-lg
-      transition
-      duration-150
-      ease-in-out"
-          >
-            Send
-          </button>
-          <button
-            type="button"
-            className="
-      w-full
-      px-6
-      py-2.5
-      bg-blue-600
-      text-white
-      font-medium
-      text-xs
-      leading-tight
-      uppercase
-      rounded
-      shadow-md
-      hover:bg-blue-700 hover:shadow-lg
-      focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0
-      active:bg-blue-800 active:shadow-lg
-      transition
-      duration-150
-      ease-in-out"
-            onClick={() => showModal(false)}
-          >
-            cancel
-          </button>
+          <div className="flex justify-between w-full px-3">
+            <button
+              className="shadow bg-indigo-600 hover:bg-indigo-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded"
+              type="submit"
+            >
+              Save
+            </button>
+            <button
+              className="shadow bg-indigo-600 hover:bg-indigo-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded"
+              type="button"
+              onClick={() => showModal(false)}
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       </div>
     </Modal>

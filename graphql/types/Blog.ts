@@ -9,6 +9,7 @@ import {
   intArg,
 } from "nexus";
 import { User } from "./User";
+
 export const Blog = objectType({
   name: "Blog",
   definition(t) {

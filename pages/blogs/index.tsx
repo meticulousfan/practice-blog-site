@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Head from "next/head";
-import { gql, useQuery, useLazyQuery } from "@apollo/client";
-import Router from "next/router";
+import { gql, useQuery } from "@apollo/client";
 import Modal from "../../components/Modal/Create";
 import { NextPage } from "next";
+import { Icon } from "@iconify/react";
 
-const BlogsQuery = gql`
-  query {
+const GET_BLOGS = gql`
+  query GetBlogs {
     blogs {
       id
       title
@@ -23,6 +22,19 @@ const BlogsQuery = gql`
   }
 `;
 
+type blog = {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  author: {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+  };
+};
+
 const Home: NextPage<{}> = () => {
   const [inform, setInform] = useState({
     show: false,
@@ -32,31 +44,36 @@ const Home: NextPage<{}> = () => {
     error: "",
   });
 
-  const { data, loading, error, refetch } = useQuery(BlogsQuery);
+  const { data, loading, error, refetch } = useQuery(GET_BLOGS);
 
   useEffect(() => {
-    refetch(BlogsQuery);
+    refetch(GET_BLOGS);
   }, []);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>oh, no...{error.message}</p>;
 
-  const showModal = (flag) => {
+  const showModal = (flag: boolean): void => {
     setInform({
       ...inform,
       show: flag,
     });
   };
 
-  const setUpdatedFlag = () => {
-    refetch(BlogsQuery);
+  const setUpdatedFlag = (): void => {
+    refetch(GET_BLOGS);
   };
 
   return (
     <div>
-      <div className="container mx-auto max-w-5xl my-20">
+      <div className="max-w-screen-xl mx-auto p-5 sm:p-10 md:p-16">
         <div>
-          <button onClick={() => showModal(true)}>+Create Blog</button>
+          <button
+            onClick={() => showModal(true)}
+            className="rounded bg-blue-500 hover:bg-blue-700 py-2 px-4 text-white"
+          >
+            <Icon icon="mdi-light:plus" className="inline"></Icon>Add blog
+          </button>
         </div>
         <div>
           <Modal
@@ -65,21 +82,29 @@ const Home: NextPage<{}> = () => {
             setUpdatedFlag={setUpdatedFlag}
           />
         </div>
-        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {data?.blogs.map((blog) => (
-            <li key={blog.id} className="shadow  max-w-md  rounded">
-              <div className="p-5 flex flex-col space-y-2">
-                <Link href={`/blogs/${blog.id}`}>
-                  <p className="text-lg font-medium hover">
-                    <a>{blog.title}</a>
-                  </p>
-                </Link>
-                <p className="text-sm text-blue-500">{blog.category}</p>
-                <p className="text-gray-600">{blog.description}</p>
-                <p className="text-gray-600">{blog.author.email}</p>
-              </div>
-            </li>
-          ))}
+        <ul className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 gap-10">
+          {data?.blogs.map(
+            (blog: blog): React.ReactNode => (
+              <li key={blog.id}>
+                <div className="rounded overflow-hidden shadow-lg">
+                  <div className="px-6 py-4">
+                    <Link href={`/blogs/${blog.id}`}>
+                      <span className="text-2xl text-blue-600 hover:text-indigo-600 hover:cursor-pointer">
+                        {blog.title}
+                      </span>
+                    </Link>
+                    <p className="text-gray-500 text-sm">{blog.description}</p>
+                    <p className="text-gray-500 text-sm">{blog.author.email}</p>
+                  </div>
+                  <div className="px-6 py-4 flex flex-row items-center">
+                    <span className="py-1 text-sm font-regular text-gray-900 mr-1 flex flex-row items-center">
+                      <span className="ml-1">2022.7.30</span>
+                    </span>
+                  </div>
+                </div>
+              </li>
+            )
+          )}
         </ul>
       </div>
     </div>

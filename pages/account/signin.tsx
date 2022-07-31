@@ -9,9 +9,14 @@ import { useRouter } from "next/router";
 import { NextPage } from "next";
 import { UserContext } from "../../components/Layout/Layout";
 
-const UserMutation = gql`
-  mutation ($email: String!, $password: String!) {
-    signin(email: $email, password: $password) {
+type signInProps = {
+  email: string;
+  password: string;
+};
+
+const SIGN_IN = gql`
+  mutation SignIn($email: String!, $password: String!) {
+    signIn(email: $email, password: $password) {
       token
       message
       user {
@@ -40,12 +45,12 @@ const Signin: NextPage<{}> = () => {
   const { register, handleSubmit, formState } = useForm(formOptions);
   const { errors } = formState;
 
-  const [signin, { loading, error }] = useMutation(UserMutation);
+  const [signIn, { loading, error }] = useMutation(SIGN_IN);
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: signInProps): void => {
     const { email, password } = data;
     const variables = { email, password };
-    signin({ variables }).then((data) => {
+    signIn({ variables }).then((data) => {
       if (data && data.data.signin.token) {
         localStorage.setItem("token", data.data.signin.token);
         setCurrentUser(data?.data.signin.user);

@@ -68,7 +68,7 @@ export const UsersQuery = extendType({
 export const UserMutation = extendType({
   type: "Mutation",
   definition(t) {
-    t.nonNull.field("signup", {
+    t.nonNull.field("signUp", {
       type: AuthPayload,
       args: {
         name: nonNull(stringArg()),
@@ -98,7 +98,7 @@ export const UserMutation = extendType({
         };
       },
     });
-    t.nonNull.field("signin", {
+    t.nonNull.field("signIn", {
       type: AuthPayload,
       args: {
         email: nonNull(stringArg()),

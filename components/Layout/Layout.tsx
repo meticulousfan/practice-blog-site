@@ -9,11 +9,11 @@ import { token } from "../../lib/apollo";
 
 export const UserContext = React.createContext({
   currentUser: null,
-  setCurrentUser: (p: object | null) => {},
+  setCurrentUser: (p: object | null): void => {},
 });
 
-const GetUserProfileQuery = gql`
-  query {
+const GET_PROFILE = gql`
+  query GetProfile {
     getProfileByToken {
       id
       name
@@ -28,7 +28,7 @@ const ContextWrapper: NextPage<AppProps> = (props) => {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState(null);
   const [localToken, setToken] = useState(token);
-  const { data, loading, error, refetch } = useQuery(GetUserProfileQuery);
+  const { data, loading, error, refetch } = useQuery(GET_PROFILE);
   useEffect(() => {
     if (!localToken) {
       router.push("/account/signin");

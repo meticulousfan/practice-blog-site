@@ -31,8 +31,8 @@ type Mutation {
   createComment(blogId: Int!, description: String!): Comment
   editBlog(category: String!, description: String!, id: Int!, title: String!): Blog!
   removeBlog(id: Int!): Blog!
-  signin(email: String!, password: String!): AuthPayload!
-  signup(email: String!, name: String!, password: String!): AuthPayload!
+  signIn(email: String!, password: String!): AuthPayload!
+  signUp(email: String!, name: String!, password: String!): AuthPayload!
 }
 
 type Query {
