@@ -51,12 +51,12 @@ const Signin: NextPage<{}> = () => {
     const { email, password } = data;
     const variables = { email, password };
     signIn({ variables }).then((data) => {
-      if (data && data.data.signin.token) {
-        localStorage.setItem("token", data.data.signin.token);
-        setCurrentUser(data?.data.signin.user);
+      if (data && data.data.signIn.token) {
+        localStorage.setItem("token", data.data.signIn.token);
+        setCurrentUser(data?.data.signIn.user);
         router.push("/blogs");
       } else {
-        setSigninError(data.data.signin.message);
+        setSigninError(data.data.signIn.message);
       }
     });
   };
