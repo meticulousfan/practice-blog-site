@@ -13,6 +13,18 @@ import { Comment } from "./Comment";
 import jwt from "jsonwebtoken";
 import { AuthPayload, userProfilePayload } from "./AuthPayload";
 import { encryptIt, decryptIt } from "../../utils/hash";
+
+const isPasswordUnMatchedOrNoUser = (
+  user: {
+    password: string;
+  },
+  args: {
+    password: string;
+  }
+): boolean => {
+  return !user || (user && decryptIt(user.password) !== args.password);
+};
+
 export const User = objectType({
   name: "User",
   definition(t) {
@@ -112,7 +124,7 @@ export const UserMutation = extendType({
         });
         let message = "";
         let token = "";
-        if (!user || (user && decryptIt(user.password) !== args.password)) {
+        if (isPasswordUnMatchedOrNoUser(user, args)) {
           message = "Incorrect email or password!";
           let user = null;
           return {
@@ -147,7 +159,6 @@ export const GetUserProfileQuery = extendType({
       resolve(_parent, _args, ctx) {
         return ctx.prisma.user.findUnique({
           where: {
-            //@ts-ignore
             email: ctx.user.email,
           },
         });
