@@ -178,11 +178,11 @@ const Detail: NextPage<{}> = () => {
           </div>
         )}
       </div>
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-3xl mx-auto mt-5">
         {data?.blog.comments.length ? (
           data?.blog.comments.map(
             (comment: comment, index: number): React.ReactNode => (
-              <div key={`comment_${index}}`}>
+              <div key={`comment_${index}}`} className="bg-gray-400">
                 <span className="text-sm text-blue-500">
                   {comment.description}
                 </span>{" "}
