@@ -89,11 +89,27 @@ const Home: NextPage<{}> = () => {
                 <div className="rounded overflow-hidden shadow-lg">
                   <div className="px-6 py-4">
                     <Link href={`/blogs/${blog.id}`}>
-                      <span className="text-2xl text-blue-600 hover:text-indigo-600 hover:cursor-pointer">
-                        {blog.title}
+                      <span
+                        className="text-2xl text-blue-600 hover:text-indigo-600 hover:cursor-pointer"
+                        title={blog.title}
+                      >
+                        {`${
+                          blog.title.length > 50
+                            ? blog.title.substr(0, 25) + "..."
+                            : blog.title
+                        }`}
                       </span>
                     </Link>
-                    <p className="text-gray-500 text-sm">{blog.description}</p>
+                    <p
+                      className="text-gray-500 text-sm"
+                      title={blog.description.substr(0, 500)}
+                    >
+                      {`${
+                        blog.description.length > 50
+                          ? blog.description.substr(0, 40) + "..."
+                          : blog.description
+                      }`}
+                    </p>
                     <p className="text-gray-500 text-sm">{blog.author.email}</p>
                   </div>
                   <div className="px-6 py-4 flex flex-row items-center">
