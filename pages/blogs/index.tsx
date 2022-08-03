@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Link from "next/link";
 import { gql, useQuery } from "@apollo/client";
 import Modal from "../../components/Modal/Create";
 import { NextPage } from "next";
 import { Icon } from "@iconify/react";
-
+import { UserContext } from "../../components/Layout/ContextWrapper";
 const GET_BLOGS = gql`
   query GetBlogs {
     blogs {
@@ -41,10 +41,11 @@ const Home: NextPage<{}> = () => {
     updated: false,
     blogs: [],
     loading: false,
-    error: "",
+    error: ""
   });
 
   const { data, loading, error, refetch } = useQuery(GET_BLOGS);
+  const { currentUser, setCurrentUser } = useContext(UserContext);
 
   useEffect(() => {
     refetch(GET_BLOGS);
@@ -56,7 +57,7 @@ const Home: NextPage<{}> = () => {
   const showModal = (flag: boolean): void => {
     setInform({
       ...inform,
-      show: flag,
+      show: flag
     });
   };
 
@@ -67,14 +68,21 @@ const Home: NextPage<{}> = () => {
   return (
     <div>
       <div className="max-w-screen-xl mx-auto p-5 sm:p-10 md:p-16">
-        <div>
-          <button
-            onClick={() => showModal(true)}
-            className="rounded bg-blue-500 hover:bg-blue-700 py-2 px-4 text-white"
-          >
-            <Icon icon="mdi-light:plus" className="inline"></Icon>Add blog
-          </button>
-        </div>
+        {currentUser && (
+          <div>
+            <button
+              onClick={() => showModal(true)}
+              className="rounded bg-blue-500 hover:bg-blue-700 py-2 px-4 text-white"
+            >
+              <Icon
+                icon="mdi-light:plus"
+                className="inline"
+                data-cy="add"
+              ></Icon>
+              Add blog
+            </button>
+          </div>
+        )}
         <div>
           <Modal
             isOpen={inform.show}
@@ -91,6 +99,8 @@ const Home: NextPage<{}> = () => {
                     <Link href={`/blogs/${blog.id}`}>
                       <span
                         className="text-2xl text-blue-600 hover:text-indigo-600 hover:cursor-pointer"
+                        data-cy={`blog-title`}
+                        data-id={blog.author.email}
                         title={blog.title}
                       >
                         {`${
