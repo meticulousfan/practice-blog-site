@@ -4,7 +4,7 @@ import { gql, useMutation } from "@apollo/client";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { NextPage } from "next";
-
+import { useRouter } from "next/router";
 const customStyles = {
   content: {
     width: "50%",
@@ -13,8 +13,8 @@ const customStyles = {
     right: "50%",
     bottom: "auto",
     marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-  },
+    transform: "translate(-50%, -50%)"
+  }
 };
 
 const EDIT_BLOG = gql`
@@ -42,7 +42,6 @@ type Props = {
   showModal: (flag: boolean) => void;
   reFetchBlog?: () => void;
   blogData: Blog;
-  id: number;
 };
 
 type Blog = {
@@ -55,13 +54,14 @@ const ModalConfirm: NextPage<Props> = ({
   isOpen,
   showModal,
   reFetchBlog,
-  blogData,
-  id,
+  blogData
 }) => {
+  const router = useRouter();
+  const id = Number(router.query.id);
   const formSchema = Yup.object().shape({
     title: Yup.string().required("title is mendatory"),
     description: Yup.string().required("description is mendatory"),
-    category: Yup.string().required("category is mendatory"),
+    category: Yup.string().required("category is mendatory")
   });
   const formOptions = { resolver: yupResolver(formSchema) };
 
@@ -71,7 +71,7 @@ const ModalConfirm: NextPage<Props> = ({
   const [editBlog] = useMutation(EDIT_BLOG);
   const onSubmit = (data: Blog) => {
     const { title, description, category } = data;
-    const variables = { title, description, category, id };
+    const variables = { title, description, category, id: id };
     try {
       editBlog({ variables }).then((res) => {
         if (res) {
@@ -107,6 +107,7 @@ const ModalConfirm: NextPage<Props> = ({
               placeholder="title"
               name="title"
               defaultValue={blogData.title}
+              data-cy="modal-title"
               {...register("title", { required: true })}
             />
           </div>
@@ -126,6 +127,7 @@ const ModalConfirm: NextPage<Props> = ({
               placeholder="title"
               name="category"
               defaultValue={blogData.category}
+              data-cy="modal-category"
               {...register("category", { required: true })}
             />
           </div>
@@ -142,6 +144,7 @@ const ModalConfirm: NextPage<Props> = ({
                 name="description"
                 {...register("description", { required: true })}
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                data-cy="modal-description"
               >
                 {blogData.description}
               </textarea>
@@ -151,12 +154,14 @@ const ModalConfirm: NextPage<Props> = ({
             <button
               className="shadow bg-indigo-600 hover:bg-indigo-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded"
               type="submit"
+              data-cy="modal-submit"
             >
               Save
             </button>
             <button
               className="shadow bg-indigo-600 hover:bg-indigo-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded"
               type="button"
+              data-cy="modal-cancel"
               onClick={() => showModal(false)}
             >
               Cancel
