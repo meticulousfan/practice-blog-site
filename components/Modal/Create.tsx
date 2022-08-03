@@ -13,8 +13,8 @@ const customStyles = {
     right: "50%",
     bottom: "auto",
     marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-  },
+    transform: "translate(-50%, -50%)"
+  }
 };
 
 const CREATE_BLOG = gql`
@@ -46,12 +46,12 @@ type Blog = {
 const ModalConfirm: NextPage<Props> = ({
   isOpen,
   showModal,
-  setUpdatedFlag,
+  setUpdatedFlag
 }) => {
   const formSchema = Yup.object().shape({
     title: Yup.string().required("title is mendatory"),
     description: Yup.string().required("description is mendatory"),
-    category: Yup.string().required("category is mendatory"),
+    category: Yup.string().required("category is mendatory")
   });
   const formOptions = { resolver: yupResolver(formSchema) };
 
@@ -95,6 +95,7 @@ const ModalConfirm: NextPage<Props> = ({
               id="grid-email"
               placeholder="title"
               name="title"
+              data-cy="title"
               {...register("title", { required: true })}
             />
           </div>
@@ -113,6 +114,7 @@ const ModalConfirm: NextPage<Props> = ({
               id="grid-email"
               placeholder="title"
               name="category"
+              data-cy="category"
               {...register("category", { required: true })}
             />
           </div>
@@ -129,6 +131,7 @@ const ModalConfirm: NextPage<Props> = ({
                 name="description"
                 {...register("description", { required: true })}
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                data-cy="description"
               ></textarea>
             </div>
           </div>
@@ -136,12 +139,14 @@ const ModalConfirm: NextPage<Props> = ({
             <button
               className="shadow bg-indigo-600 hover:bg-indigo-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded"
               type="submit"
+              data-cy="submit"
             >
               Save
             </button>
             <button
               className="shadow bg-indigo-600 hover:bg-indigo-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-6 rounded"
               type="button"
+              data-cy="cancel"
               onClick={() => showModal(false)}
             >
               Cancel
