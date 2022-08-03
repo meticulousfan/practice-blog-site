@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
@@ -6,8 +6,9 @@ import { NextPage } from "next";
 import Modal from "../../../components/Modal/Edit";
 import swal from "sweetalert";
 import toast, { Toaster } from "react-hot-toast";
-import { UserContext } from "../../../components/Layout/Layout";
+import { UserContext } from "../../../components/Layout/ContextWrapper";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { GetServerSideProps } from "next";
 import * as Yup from "yup";
 
 type blog = {
@@ -77,19 +78,18 @@ const CREATE_COMMENT = gql`
   }
 `;
 
-const Detail: NextPage<{}> = () => {
+const Detail = ({ id }) => {
   const [inform, setInform] = useState({
-    show: false,
+    show: false
   });
   const router = useRouter();
-  const id = router.query.id;
   const { currentUser, setCurrentUser } = useContext(UserContext);
   const [removeBlog] = useMutation(REMOVE_BLOG);
   const { data, loading, error, refetch } = useQuery(GET_BLOG, {
-    variables: { id: Number(id) },
+    variables: { id: Number(id) }
   });
   const formSchema = Yup.object().shape({
-    description: Yup.string().required("description is mendatory"),
+    description: Yup.string().required("description is mendatory")
   });
   const formOptions = { resolver: yupResolver(formSchema) };
   const { register, handleSubmit, formState } = useForm(formOptions);
@@ -104,7 +104,7 @@ const Detail: NextPage<{}> = () => {
         .promise(createComment({ variables }), {
           loading: "Creating new comment..",
           success: "Blog successfully created!🎉",
-          error: `Something went wrong 😥 Please try again -  ${error}`,
+          error: `Something went wrong 😥 Please try again -  ${error}`
         })
         .then(() => {
           reFetchBlog();
@@ -120,7 +120,7 @@ const Detail: NextPage<{}> = () => {
   const showModal = (flag: boolean): void => {
     setInform({
       ...inform,
-      show: flag,
+      show: flag
     });
   };
 
@@ -131,7 +131,7 @@ const Detail: NextPage<{}> = () => {
   const toggleDelete = (): void => {
     swal({
       text: "Are you sure to delete?",
-      buttons: ["Close", "Ok"],
+      buttons: ["Close", "Ok"]
     }).then((status) => {
       if (status) {
         const variables = { id: Number(id) };
@@ -139,7 +139,7 @@ const Detail: NextPage<{}> = () => {
           .promise(removeBlog({ variables }), {
             loading: "Deleting new blog..",
             success: "Blog successfully removed!🎉",
-            error: `Something went wrong 😥😥 Please try again -  ${error}`,
+            error: `Something went wrong 😥😥 Please try again -  ${error}`
           })
           .then(() => {
             router.push("/blogs");
@@ -165,12 +165,14 @@ const Detail: NextPage<{}> = () => {
           <div className="ml-auto">
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded-full mr-4"
+              data-cy="edit"
               onClick={() => showModal(true)}
             >
               Edit
             </button>
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded-full"
+              data-cy="delete"
               onClick={() => toggleDelete()}
             >
               delete
@@ -183,7 +185,10 @@ const Detail: NextPage<{}> = () => {
           data?.blog.comments.map(
             (comment: comment, index: number): React.ReactNode => (
               <div key={`comment_${index}}`} className="bg-gray-400">
-                <span className="text-sm text-blue-500">
+                <span
+                  className="text-sm text-blue-500"
+                  data-cy={`${comment.description}`}
+                >
                   {comment.description}
                 </span>{" "}
                 <span className="text-sm text-gray-500">
@@ -196,15 +201,16 @@ const Detail: NextPage<{}> = () => {
           <p className="text-sm text-blue-500">No comment</p>
         )}
       </div>
-      <div className="max-w-3xl mx-auto">
-        <form
-          className="grid grid-cols-1 gap-y-6 p-8"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <span className="text-center">Add a Comment</span>
-          <div className="form-group mb-6">
-            <textarea
-              className="
+      {currentUser && (
+        <div className="max-w-3xl mx-auto">
+          <form
+            className="grid grid-cols-1 gap-y-6 p-8"
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <span className="text-center">Add a Comment</span>
+            <div className="form-group mb-6">
+              <textarea
+                className="
                           form-control
                           block
                           w-full
@@ -221,30 +227,42 @@ const Detail: NextPage<{}> = () => {
                           m-0
                           focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none
                         "
-              id="exampleFormControlTextarea13"
-              rows={3}
-              placeholder="description"
-              name="description"
-              {...register("description", { required: true })}
-            ></textarea>
-          </div>
-          <button
-            type="submit"
-            className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
-          >
-            <span className="ml-3">Add a comment</span>
-          </button>
-        </form>
-      </div>
+                id="exampleFormControlTextarea13"
+                rows={3}
+                placeholder="description"
+                name="description"
+                data-cy="comment-description"
+                {...register("description", { required: true })}
+              ></textarea>
+            </div>
+            <button
+              type="submit"
+              className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+              data-cy="add-comment"
+            >
+              <span className="ml-3">Add a comment</span>
+            </button>
+          </form>
+        </div>
+      )}
       <Modal
         isOpen={inform.show}
         showModal={showModal}
         blogData={data?.blog}
-        id={Number(id)}
         reFetchBlog={reFetchBlog}
       ></Modal>
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const id = context.query.id;
+
+  return {
+    props: {
+      id: id
+    }
+  };
 };
 
 export default Detail;
