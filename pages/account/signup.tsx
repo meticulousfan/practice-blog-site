@@ -38,7 +38,7 @@ const Signup: NextPage<{}> = () => {
       .min(3, "Password must be at 3 char long"),
     confirmPwd: Yup.string()
       .required("Password is mendatory")
-      .oneOf([Yup.ref("password")], "Passwords does not match"),
+      .oneOf([Yup.ref("password")], "Passwords does not match")
   });
   const formOptions = { resolver: yupResolver(formSchema) };
 
@@ -55,7 +55,7 @@ const Signup: NextPage<{}> = () => {
         .promise(signUp({ variables }), {
           loading: "Creating new User..",
           success: "User successfully created!🎉",
-          error: `Something went wrong 😥 Please try again -  ${error}`,
+          error: `Something went wrong 😥 Please try again -  ${error}`
         })
         .then((data) => {
           router.push("/account/signin");
@@ -81,6 +81,7 @@ const Signup: NextPage<{}> = () => {
               <div className="mx-auto max-w-xs">
                 <input
                   className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
+                  data-cy="name"
                   type="name"
                   name="name"
                   {...register("name", { required: true })}
@@ -88,6 +89,7 @@ const Signup: NextPage<{}> = () => {
                 />
                 <input
                   className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                  data-cy="email"
                   type="email"
                   name="email"
                   {...register("email", { required: true })}
@@ -95,6 +97,7 @@ const Signup: NextPage<{}> = () => {
                 />
                 <input
                   className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                  data-cy="password"
                   type="password"
                   {...register("password")}
                   name="password"
@@ -105,6 +108,7 @@ const Signup: NextPage<{}> = () => {
                 </div>
                 <input
                   className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                  data-cy="password_confirm"
                   placeholder="confirm password"
                   {...register("confirmPwd")}
                   name="confirmPwd"
@@ -115,7 +119,8 @@ const Signup: NextPage<{}> = () => {
                 </div>
                 <button
                   type="submit"
-                  className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
+                  data-cy="submit"
+                  className="signup-button mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
                 >
                   <svg
                     className="w-6 h-6 -ml-2"
