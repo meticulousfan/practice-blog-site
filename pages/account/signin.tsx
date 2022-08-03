@@ -7,7 +7,7 @@ import * as Yup from "yup";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { NextPage } from "next";
-import { UserContext } from "../../components/Layout/Layout";
+import { UserContext } from "../../components/Layout/ContextWrapper";
 
 type signInProps = {
   email: string;
@@ -38,7 +38,7 @@ const Signin: NextPage<{}> = () => {
   }, []);
   const router = useRouter();
   const formSchema = Yup.object().shape({
-    password: Yup.string().required("Password is mendatory"),
+    password: Yup.string().required("Password is mendatory")
   });
   const formOptions = { resolver: yupResolver(formSchema) };
 
@@ -50,13 +50,13 @@ const Signin: NextPage<{}> = () => {
   const onSubmit = (data: signInProps): void => {
     const { email, password } = data;
     const variables = { email, password };
-    signIn({ variables }).then((data) => {
-      if (data && data.data.signIn.token) {
-        localStorage.setItem("token", data.data.signIn.token);
-        setCurrentUser(data?.data.signIn.user);
+    signIn({ variables }).then(({ data }) => {
+      if (data && data.signIn.token) {
+        localStorage.setItem("token", data?.signIn.token);
+        setCurrentUser(data?.signIn.user);
         router.push("/blogs");
       } else {
-        setSigninError(data.data.signIn.message);
+        setSigninError(data?.signIn.message);
       }
     });
   };
@@ -78,6 +78,7 @@ const Signin: NextPage<{}> = () => {
             type="text"
             {...register("email", { required: true })}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            data-cy="email"
           />
         </label>
         <label className="block">
@@ -87,13 +88,15 @@ const Signin: NextPage<{}> = () => {
             {...register("password")}
             name="password"
             type="password"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            className="signin-input-password mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            data-cy="password"
           />
           <div className="invalid-feedback">{errors.password?.message}</div>
         </label>
         <button
           type="submit"
           className="my-4 capitalize bg-blue-500 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-600"
+          data-cy="submit"
         >
           submit
         </button>
