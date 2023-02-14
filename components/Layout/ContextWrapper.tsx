@@ -5,11 +5,10 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 
 import Layout from "./Layout";
-import { token } from "../../lib/apollo";
 
 export const UserContext = React.createContext({
   currentUser: null,
-  setCurrentUser: (p: object | null): void => {}
+  setCurrentUser: (p: object | null): void => {},
 });
 
 const GET_PROFILE = gql`
@@ -27,10 +26,13 @@ const ContextWrapper: NextPage<AppProps> = (props) => {
   const { Component, pageProps } = props;
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState(null);
-  const [localToken, setToken] = useState(token);
   const { data, loading, error, refetch } = useQuery(GET_PROFILE);
   useEffect(() => {
-    if (localToken) {
+    let token = "";
+    if (typeof window !== undefined) {
+      token = localStorage.getItem("token");
+    }
+    if (token) {
       if (data && data?.getProfileByToken) {
         setCurrentUser(data?.getProfileByToken);
       }

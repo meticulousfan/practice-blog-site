@@ -80,16 +80,16 @@ const CREATE_COMMENT = gql`
 
 const Detail = ({ id }) => {
   const [inform, setInform] = useState({
-    show: false
+    show: false,
   });
   const router = useRouter();
   const { currentUser, setCurrentUser } = useContext(UserContext);
   const [removeBlog] = useMutation(REMOVE_BLOG);
   const { data, loading, error, refetch } = useQuery(GET_BLOG, {
-    variables: { id: Number(id) }
+    variables: { id: Number(id) },
   });
   const formSchema = Yup.object().shape({
-    description: Yup.string().required("description is mendatory")
+    description: Yup.string().required("description is mendatory"),
   });
   const formOptions = { resolver: yupResolver(formSchema) };
   const { register, handleSubmit, formState } = useForm(formOptions);
@@ -104,7 +104,7 @@ const Detail = ({ id }) => {
         .promise(createComment({ variables }), {
           loading: "Creating new comment..",
           success: "Blog successfully created!🎉",
-          error: `Something went wrong 😥 Please try again -  ${error}`
+          error: `Something went wrong 😥 Please try again -  ${error}`,
         })
         .then(() => {
           reFetchBlog();
@@ -120,7 +120,7 @@ const Detail = ({ id }) => {
   const showModal = (flag: boolean): void => {
     setInform({
       ...inform,
-      show: flag
+      show: flag,
     });
   };
 
@@ -131,7 +131,7 @@ const Detail = ({ id }) => {
   const toggleDelete = (): void => {
     swal({
       text: "Are you sure to delete?",
-      buttons: ["Close", "Ok"]
+      buttons: ["Close", "Ok"],
     }).then((status) => {
       if (status) {
         const variables = { id: Number(id) };
@@ -139,7 +139,7 @@ const Detail = ({ id }) => {
           .promise(removeBlog({ variables }), {
             loading: "Deleting new blog..",
             success: "Blog successfully removed!🎉",
-            error: `Something went wrong 😥😥 Please try again -  ${error}`
+            error: `Something went wrong 😥😥 Please try again -  ${error}`,
           })
           .then(() => {
             router.push("/blogs");
@@ -260,8 +260,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   return {
     props: {
-      id: id
-    }
+      id: id,
+    },
   };
 };
 

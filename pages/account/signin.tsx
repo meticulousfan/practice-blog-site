@@ -38,7 +38,7 @@ const Signin: NextPage<{}> = () => {
   }, []);
   const router = useRouter();
   const formSchema = Yup.object().shape({
-    password: Yup.string().required("Password is mendatory")
+    password: Yup.string().required("Password is mendatory"),
   });
   const formOptions = { resolver: yupResolver(formSchema) };
 

@@ -38,7 +38,7 @@ const Signup: NextPage<{}> = () => {
       .min(3, "Password must be at 3 char long"),
     confirmPwd: Yup.string()
       .required("Password is mendatory")
-      .oneOf([Yup.ref("password")], "Passwords does not match")
+      .oneOf([Yup.ref("password")], "Passwords does not match"),
   });
   const formOptions = { resolver: yupResolver(formSchema) };
 
@@ -55,7 +55,7 @@ const Signup: NextPage<{}> = () => {
         .promise(signUp({ variables }), {
           loading: "Creating new User..",
           success: "User successfully created!🎉",
-          error: `Something went wrong 😥 Please try again -  ${error}`
+          error: `Something went wrong 😥 Please try again -  ${error}`,
         })
         .then((data) => {
           router.push("/account/signin");

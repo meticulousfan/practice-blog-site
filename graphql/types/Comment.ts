@@ -1,6 +1,8 @@
 // /graphql/types/Comment.ts
 import { objectType, extendType, nonNull, stringArg, intArg, arg } from "nexus";
 import { User } from "./User";
+import { Blog } from "./Blog";
+
 export const Comment = objectType({
   name: "Comment",
   definition(t) {
@@ -18,6 +20,18 @@ export const Comment = objectType({
             },
           })
           .author();
+      },
+    });
+    t.nonNull.field("blog", {
+      type: Blog,
+      async resolve(_parent, _args, ctx) {
+        return await ctx.prisma.comment
+          .findUnique({
+            where: {
+              id: _parent.id,
+            },
+          })
+          .blog();
       },
     });
   },

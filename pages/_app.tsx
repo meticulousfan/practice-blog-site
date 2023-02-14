@@ -9,7 +9,7 @@ import Modal from "react-modal";
 
 Modal.setAppElement("body");
 
-const MyApp: NextPage<AppProps> = (props) => {
+const MyApp: NextPage<AppProps> = (props: AppProps) => {
   return (
     <ApolloProvider client={apolloClient}>
       <ContextWrapper {...props} />

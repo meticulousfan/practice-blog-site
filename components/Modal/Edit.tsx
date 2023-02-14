@@ -13,26 +13,27 @@ const customStyles = {
     right: "50%",
     bottom: "auto",
     marginRight: "-50%",
-    transform: "translate(-50%, -50%)"
-  }
+    transform: "translate(-50%, -50%)",
+  },
 };
 
 const EDIT_BLOG = gql`
   mutation EditBlog(
-    $id: Int!
     $title: String!
     $description: String!
     $category: String!
+    $id: Int!
   ) {
     editBlog(
-      id: $id
       title: $title
       description: $description
       category: $category
+      id: $id
     ) {
       title
       description
       category
+      id
     }
   }
 `;
@@ -54,14 +55,14 @@ const ModalConfirm: NextPage<Props> = ({
   isOpen,
   showModal,
   reFetchBlog,
-  blogData
+  blogData,
 }) => {
   const router = useRouter();
   const id = Number(router.query.id);
   const formSchema = Yup.object().shape({
     title: Yup.string().required("title is mendatory"),
     description: Yup.string().required("description is mendatory"),
-    category: Yup.string().required("category is mendatory")
+    category: Yup.string().required("category is mendatory"),
   });
   const formOptions = { resolver: yupResolver(formSchema) };
 
@@ -69,18 +70,22 @@ const ModalConfirm: NextPage<Props> = ({
   const { errors } = formState;
 
   const [editBlog] = useMutation(EDIT_BLOG);
-  const onSubmit = (data: Blog) => {
+  const onSubmit = async (data: Blog) => {
     const { title, description, category } = data;
-    const variables = { title, description, category, id: id };
+    const variables = {
+      title,
+      description,
+      category,
+      id: Number(router.query.id),
+    };
     try {
-      editBlog({ variables }).then((res) => {
-        if (res) {
-          reFetchBlog();
-          showModal(false);
-        }
-      });
+      const res = await editBlog({ variables });
+      if (res) {
+        reFetchBlog();
+        showModal(false);
+      }
     } catch (error) {
-      console.error(error);
+      console.error(">>>>", error);
     }
   };
 
@@ -143,10 +148,11 @@ const ModalConfirm: NextPage<Props> = ({
                 rows={10}
                 name="description"
                 {...register("description", { required: true })}
+                defaultValue={blogData.description}
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 data-cy="modal-description"
               >
-                {blogData.description}
+                {/* {blogData.description} */}
               </textarea>
             </div>
           </div>

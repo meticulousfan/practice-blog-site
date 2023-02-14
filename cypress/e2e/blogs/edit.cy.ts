@@ -1,9 +1,4 @@
-import {
-  join_graphQL,
-  graphqlReqConfig
-} from "../../../utils/graphql-test-utils";
-let currentUser = null;
-context("Edit blog page", () => {
+describe("Edit blog page", () => {
   beforeEach(() => {
     cy.visit("/account/signin");
     cy.get('[data-cy="email"]')
@@ -12,7 +7,11 @@ context("Edit blog page", () => {
     cy.get('[data-cy="password"]')
       .type("123")
       .should("have.value", Cypress.env("password"));
-    cy.get('[data-cy="submit"]').click();
+    cy.get('[data-cy="submit"]')
+      .click()
+      .should(() => {
+        expect(localStorage.getItem("token")).to.exist;
+      });
   });
   it("should show blog list with user name", () => {
     cy.get(`[data-id="${Cypress.env("email")}"]`)
@@ -33,7 +32,7 @@ context("Edit blog page", () => {
       .type("when I was a young meerkat")
       .should("have.value", "when I was a young meerkat");
     cy.get('[data-cy="modal-submit"]').click();
-    // cy.wait(3000);
-    // cy.contains("when I was a young meerkat");
+    cy.wait(3000);
+    cy.contains("when I was a young meerkat");
   });
 });

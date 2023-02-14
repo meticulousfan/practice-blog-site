@@ -5,6 +5,7 @@ import Modal from "../../components/Modal/Create";
 import { NextPage } from "next";
 import { Icon } from "@iconify/react";
 import { UserContext } from "../../components/Layout/ContextWrapper";
+
 const GET_BLOGS = gql`
   query GetBlogs {
     blogs {

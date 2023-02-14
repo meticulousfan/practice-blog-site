@@ -21,6 +21,7 @@ type Blog {
 type Comment {
   author: User!
   authorId: Int
+  blog: Blog!
   blogId: Int
   description: String
   id: Int

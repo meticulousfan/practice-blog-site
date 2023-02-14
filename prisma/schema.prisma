@@ -39,7 +39,7 @@ model Comment {
   authorId    Int
   blogId      Int
   author      User     @relation(fields: [authorId], references: [id])
-  blog        Blog     @relation(fields: [blogId], references: [id])
+  blog        Blog     @relation(fields: [blogId], references: [id], onDelete:Cascade)
 }
 
 enum Role {

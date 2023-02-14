@@ -15,6 +15,6 @@ export const graphqlReqConfig = (
     method,
     body,
     url: api,
-    failOnStatusCode: false
+    failOnStatusCode: false,
   };
 };
